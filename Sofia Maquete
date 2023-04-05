@@ -1,0 +1,201 @@
+#include "FirebaseESP8266.h"
+#include <ESP8266WiFi.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#define DHTTYPE DHT11
+
+FirebaseData firebaseData;
+
+
+
+#define LED_1 D6
+#define LED_2 D1
+#define LED_3 D2 
+#define LED_4 D3
+#define LED_anbiente D4
+#define portao D5
+
+#define DHT1 D5
+
+
+
+DHT dht1 = DHT(DHT1, DHTTYPE);
+
+const char* ssid = "[Your SSID]";
+const char* senha = "[Your SSID password]";
+
+int val;
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  connectWifi();
+
+
+  Firebase.begin("[Link para o RealTime Database do Firebase]", "[Chave especial de acesso]");  
+  
+  dht1.begin();
+
+  
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_1, OUTPUT);
+  pinMode(LED_2, OUTPUT);
+  pinMode(LED_3, OUTPUT);
+  pinMode(LED_4, OUTPUT);
+  pinMode(LED_anbiente, OUTPUT);
+  pinMode(portao, OUTPUT);
+
+  
+
+}
+
+void loop() {
+  
+  fireleds();
+  readdht();
+  
+}
+
+void connectWifi() {
+  // Let us connect to WiFi
+  WiFi.begin(ssid, senha);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println(".......");
+  Serial.println("WiFi Connected....IP Address:");
+  Serial.println(WiFi.localIP());
+}
+
+void fireleds(){
+
+//458Xps
+  
+  if (Firebase.getInt(firebaseData, "/0LmSzN")) {
+    if  (firebaseData.dataType() == "int") {
+      val = firebaseData.intData();
+      if (val != d_null) {
+        if(val == 0){
+          digitalWrite(LED_1, LOW);
+        }
+        if(val == 2){
+          digitalWrite(LED_1, HIGH);
+        }
+        Serial.println(val);
+        val = d_null;
+      }
+    }
+    }
+
+//551EVh
+    if (Firebase.getInt(firebaseData, "/0XwwkB")) {
+    if  (firebaseData.dataType() == "int") {
+      val = firebaseData.intData();
+      if (val != d_null) {
+        if(val == 0){
+          digitalWrite(LED_2, LOW);
+        }
+        if(val == 2){
+          digitalWrite(LED_2, HIGH);
+        }
+        Serial.println(val);
+        val = d_null;
+      }
+    }
+    }
+
+//6ez3O4
+    if (Firebase.getInt(firebaseData, "/2OEIkc")) {
+    if  (firebaseData.dataType() == "int") {
+      val = firebaseData.intData();
+      if (val != d_null) {
+        if(val == 0){
+          digitalWrite(LED_3, LOW);
+        }
+        if(val == 2){
+          digitalWrite(LED_3, HIGH);
+        }
+        Serial.println(val);
+        val = d_null;
+      }
+    }
+    }
+
+//75Pd67
+    if (Firebase.getInt(firebaseData, "/4d8UWh")) {
+    if  (firebaseData.dataType() == "int") {
+      val = firebaseData.intData();
+      if (val != d_null) {
+        if(val == 0){
+          digitalWrite(LED_4, LOW);
+        }
+        if(val == 2){
+          digitalWrite(LED_4, HIGH);
+        }
+        Serial.println(val);
+        val = d_null;
+      }
+    }
+    }
+
+
+    if (Firebase.getInt(firebaseData, "/O0DZlg")) {
+    if  (firebaseData.dataType() == "int") {
+      val = firebaseData.intData();
+      if (val != d_null) {
+        if(val == 0){
+          digitalWrite(LED_anbiente, LOW);
+        }
+        if(val == 2){
+          digitalWrite(LED_anbiente, HIGH);
+        }
+        Serial.println(val);
+        val = d_null;
+      }
+    }
+    }
+
+
+    if (Firebase.getInt(firebaseData, "/Qqya6B")) {
+    if  (firebaseData.dataType() == "int") {
+      val = firebaseData.intData();
+      if (val != d_null) {
+        if(val == 0){
+          digitalWrite(portao, LOW);
+        }
+        if(val == 2){
+          digitalWrite(portao, HIGH);
+        }
+        Serial.println(val);
+        val = d_null;
+      }
+    }
+    }
+    
+}
+
+void readdht(){
+  
+  float h1 = dht1.readHumidity();
+  float t1 = dht1.readTemperature();
+  float hic1 = dht1.computeHeatIndex(t1, h1, false);
+  
+  if (isnan(h1) || isnan(t1)) {
+    Serial.println("Falha ao ler do sensor DHT1!");
+    return;
+  }
+
+  Firebase.setFloat(firebaseData, "/TnEf9Z", t1);
+
+  Serial.print("DHT1 Umidade: ");
+  Serial.print(h1);
+  Serial.print(" % | ");
+  Serial.print("DHT1 Temperatura: ");
+  Serial.print(t1);
+  Serial.print("C | ");
+  Serial.print("DHT1 Índice de calor: ");
+  Serial.print(hic1);
+  Serial.println("C | ");
+    
+}
